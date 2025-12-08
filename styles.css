@@ -1,0 +1,30 @@
+:root {
+  --bg-main: #e0e0e0;
+  --bg-panel: #888888;
+  --text-main: #0a0a0a;
+  --text-muted: #111111;
+  --accent: #ff3333;
+  --border: #222222;
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --card-hover: rgba(0, 0, 0, 0.05);
+  --focus-ring: #ff3333;
+}
+[data-theme="dark"] {
+  --bg-main: #222222;
+  --bg-panel: #282828;
+  --text-main: #e6edf3;
+  --text-muted: #8b949e;
+  --accent: #00f0ff;
+  --border: #21262d;
+  --input-bg: #30363d;
+  --card-hover: rgba(0, 240, 255, 0.05);
+  --focus-ring: #00f0ff;
+}
+
+#rem-output {
+  max-width: 6.25rem;
+  border: 2px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-main);
+}
