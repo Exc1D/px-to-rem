@@ -4,8 +4,8 @@ A polished, fully interactive, browser-based unit converter that converts **px â
 
 This tool is ideal for designers and developers who want a fast, accurate, and ergonomic workflow when working with responsive CSS values.
 
-![Dark mode](https://imgur.com/yvroRWH)
-![Light mode](https://imgur.com/u6tQ9AJ)
+![Dark mode](https://i.imgur.com/yvroRWH.png)
+![Light mode](https://i.imgur.com/u6tQ9AJ.png)
 
 ---
 
