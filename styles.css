@@ -1,9 +1,9 @@
 :root {
-  --bg-main: #e0e0e0;
-  --bg-panel: #888888;
+  --bg-main: #888888;
+  --bg-panel: #e0e0e0;
   --text-main: #0a0a0a;
   --text-muted: #111111;
-  --accent: #a70000;
+  --accent: #ff3333;
   --border: #222222;
   --input-bg: rgba(255, 255, 255, 0.1);
   --card-hover: rgba(0, 0, 0, 0.05);
@@ -196,11 +196,12 @@ button {
 }
 
 #convert-btn {
-  background: var(--accent);
+  background: var(--bg-main);
   color: white;
 }
 
 #convert-btn:hover {
+  background: var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(255, 51, 51, 0.3);
   filter: brightness(1.1);
