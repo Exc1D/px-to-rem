@@ -3,14 +3,455 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PX to REM Converter</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>PX ⇄ REM Converter</title>
+    <style>
+      :root {
+        --bg-main: #e0e0e0;
+        --bg-panel: #888888;
+        --text-main: #0a0a0a;
+        --text-muted: #111111;
+        --accent: #ff3333;
+        --border: #222222;
+        --input-bg: rgba(255, 255, 255, 0.1);
+        --card-hover: rgba(0, 0, 0, 0.05);
+        --focus-ring: #ff3333;
+      }
+
+      [data-theme="dark"] {
+        --bg-main: #222222;
+        --bg-panel: #282828;
+        --text-main: #e6edf3;
+        --text-muted: #8b949e;
+        --accent: #00f0ff;
+        --border: #21262d;
+        --input-bg: #30363d;
+        --card-hover: rgba(0, 240, 255, 0.05);
+        --focus-ring: #00f0ff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .container {
+        background: var(--bg-panel);
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 500px;
+        min-width: 200px;
+        transition: all 0.3s ease;
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--accent);
+        margin-bottom: 8px;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+        font-size: clamp(18px, 5vw, 28px);
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+
+      h1:hover {
+        transform: scale(1.02);
+        filter: brightness(1.2);
+      }
+
+      h1::after {
+        content: "⇄";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+      }
+
+      h1:hover::after {
+        opacity: 1;
+        animation: rotate 0.5s ease;
+      }
+
+      @keyframes rotate {
+        0%,
+        100% {
+          transform: translateY(-50%) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-50%) rotate(180deg);
+        }
+      }
+
+      .hint-text {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+        opacity: 0.7;
+      }
+
+      .input-group {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      label[for="px-input"] {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--text-muted);
+        pointer-events: none;
+        background: var(--bg-panel);
+        padding: 0 6px;
+        font-size: 14px;
+        z-index: 1;
+      }
+
+      label[for="px-input"].active {
+        top: -8px;
+        left: 10px;
+        font-size: 11px;
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        width: 100%;
+        padding: 14px;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: var(--input-bg);
+        color: var(--text-main);
+        font-family: inherit;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--card-hover);
+      }
+
+      input.error {
+        border-color: #ff3333;
+        animation: shake 0.3s;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-8px);
+        }
+        75% {
+          transform: translateX(8px);
+        }
+      }
+
+      #rem-output {
+        background: var(--input-bg);
+        cursor: default;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+
+      #convert-btn {
+        background: var(--accent);
+        color: white;
+      }
+
+      #convert-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 51, 51, 0.3);
+        filter: brightness(1.1);
+      }
+
+      #convert-btn:active {
+        transform: translateY(0);
+      }
+
+      #clear-btn {
+        background: var(--input-bg);
+        color: var(--text-main);
+        border: 2px solid var(--border);
+      }
+
+      #clear-btn:hover {
+        background: var(--card-hover);
+        border-color: var(--accent);
+      }
+
+      #copy-feedback {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      #copy-feedback.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #copy-feedback.success {
+        background: #28a745;
+        color: white;
+        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
+      }
+
+      #copy-feedback.error {
+        background: #ff3333;
+        color: white;
+        box-shadow: 0 6px 16px rgba(255, 51, 51, 0.3);
+      }
+
+      .presets-section {
+        margin-bottom: 20px;
+      }
+
+      .presets-section h3 {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+
+      #presets {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .preset-btn {
+        padding: 8px 14px;
+        border: 2px solid var(--accent);
+        background: var(--input-bg);
+        color: var(--accent);
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s ease;
+      }
+
+      .preset-btn:hover {
+        background: var(--accent);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px var(--card-hover);
+      }
+
+      .preset-btn:active {
+        transform: translateY(0);
+      }
+
+      .settings-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 12px;
+        background: var(--input-bg);
+        border-radius: 10px;
+        border: 2px solid var(--border);
+      }
+
+      .settings-section label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        white-space: nowrap;
+      }
+
+      .settings-section input {
+        width: 70px;
+        padding: 8px;
+      }
+
+      .settings-section span {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .batch-section {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 2px solid var(--border);
+      }
+
+      .batch-section h3 {
+        margin-bottom: 12px;
+        color: var(--accent);
+        font-size: 16px;
+      }
+
+      textarea {
+        min-height: 80px;
+        margin-bottom: 10px;
+        resize: vertical;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      #dark-mode-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        padding: 10px 16px;
+        background: var(--bg-panel);
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      #dark-mode-toggle:hover {
+        transform: scale(1.05);
+        background: var(--accent);
+        color: white;
+      }
+
+      /* Responsive design - minimum 200px */
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px;
+          min-width: 200px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        h1::after {
+          font-size: 16px;
+        }
+
+        .hint-text {
+          font-size: 11px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        button {
+          padding: 12px;
+        }
+
+        #dark-mode-toggle {
+          top: 12px;
+          left: 12px;
+          padding: 8px 12px;
+          font-size: 12px;
+        }
+
+        #copy-feedback {
+          top: 12px;
+          right: 12px;
+          padding: 10px 16px;
+          font-size: 12px;
+        }
+
+        .settings-section {
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width: 300px) {
+        .container {
+          padding: 16px;
+        }
+
+        h1 {
+          font-size: 16px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+          padding: 10px;
+          font-size: 13px;
+        }
+
+        button {
+          padding: 10px;
+          font-size: 13px;
+        }
+
+        .preset-btn {
+          padding: 6px 10px;
+          font-size: 12px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <button id="dark-mode-toggle">🌗</button>
+    <button id="dark-mode-toggle">🌙 Dark</button>
 
     <div class="container">
-      <h1>Convert px to rem</h1>
+      <h1 title="Click to toggle conversion direction">Convert px to rem</h1>
+      <p class="hint-text">👆 Click title to switch direction</p>
 
       <div class="input-group">
         <label for="px-input">Enter Value in px</label>
@@ -22,7 +463,7 @@
       </div>
 
       <div class="button-group">
-        <button id="convert-btn">Convert</button>
+        <button id="convert-btn">Convert & Copy</button>
         <button id="clear-btn">Clear</button>
       </div>
 
@@ -32,7 +473,7 @@
       </div>
 
       <div class="settings-section">
-        <label for="base-font">Base Font Size:</label>
+        <label for="base-font">Base:</label>
         <input type="number" id="base-font" min="1" value="16" />
         <span>px</span>
       </div>
