@@ -4,7 +4,7 @@ A polished, fully interactive, browser-based unit converter that converts **px â
 
 This tool is ideal for designers and developers who want a fast, accurate, and ergonomic workflow when working with responsive CSS values.
 
-[App preview](https://imgur.com/a/px-to-rem-converter-kHe3Pbk)
+![App preview](https://imgur.com/a/px-to-rem-converter-kHe3Pbk)
 
 ---
 
