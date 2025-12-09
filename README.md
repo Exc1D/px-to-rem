@@ -1,23 +1,3 @@
-Perfect — now that I have your full codebase, I can generate a **much more complete, accurate, and professional README.md** tailored exactly to *your actual features*, not just a generic px→rem tool.
-
-Below is your **improved and feature-complete documentation**, covering:
-
-* Full feature list
-* Precise behavior of your rounding logic
-* Auto-copy + delayed copy
-* Batch mode
-* Dark mode persistence
-* Keyboard shortcuts
-* Presets
-* Developer notes
-* Roadmap
-* File structure
-* Technical architecture
-
-You can copy/paste this directly into your repo as **README.md**.
-
----
-
 # PX ⇄ REM Converter
 
 A polished, fully interactive, browser-based unit converter that converts **px ⇄ rem** with smart rounding, live updates, batch processing, presets, dark mode, and automatic clipboard copying.
