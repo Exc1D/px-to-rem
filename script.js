@@ -2,11 +2,13 @@
 const DEFAULT_BASE_FONT_SIZE = 16;
 const ROUNDING_PRECISION = 20; // 1/20 = 0.05
 const COPY_FEEDBACK_DURATION = 2000; // 2 seconds
+const COPY_DELAY = 800; // 800ms delay before auto-copy
 const COMMON_PRESETS = [8, 16, 24, 32, 48, 64];
 
 // State
 let isPxToRem = true;
 let baseFontSize = DEFAULT_BASE_FONT_SIZE;
+let copyTimeout = null; // For debouncing auto-copy
 
 // DOM Elements - will be initialized after DOM loads
 let elements = {};
@@ -57,7 +59,7 @@ function showCopyFeedback(success) {
 }
 
 // Conversion Handler
-async function handleConvert() {
+async function handleConvert(shouldCopy = true) {
   const value = parseFloat(elements.input.value);
 
   // Validation
@@ -73,8 +75,10 @@ async function handleConvert() {
   const result = isPxToRem ? convertPxToRem(value) : convertRemToPx(value);
   elements.output.value = result;
 
-  // Copy to clipboard
-  await copyToClipboard(result.toString());
+  // Copy to clipboard only if explicitly requested
+  if (shouldCopy) {
+    await copyToClipboard(result.toString());
+  }
 }
 
 // Mode Toggle
@@ -131,7 +135,7 @@ function handleClear() {
 function handlePresetClick(value) {
   elements.input.value = value;
   elements.label.classList.add("active");
-  handleConvert();
+  handleConvert(true); // Copy immediately for presets
 }
 
 // Focus Handlers
@@ -266,8 +270,8 @@ function initializeElements() {
 
 // Event Listeners Setup
 function setupEventListeners() {
-  // Main conversion
-  elements.button.addEventListener("click", handleConvert);
+  // Main conversion - with copy
+  elements.button.addEventListener("click", () => handleConvert(true));
 
   // Input events
   elements.input.addEventListener("focus", handleInputFocus);
@@ -275,16 +279,38 @@ function setupEventListeners() {
   elements.input.addEventListener("input", () => {
     if (elements.input.value) {
       elements.label.classList.add("active");
-      handleConvert(); // Real-time conversion
+
+      // Clear existing timeout
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+
+      // Convert immediately but don't copy
+      handleConvert(false);
+
+      // Schedule delayed copy
+      copyTimeout = setTimeout(() => {
+        if (elements.input.value) {
+          copyToClipboard(elements.output.value);
+        }
+      }, COPY_DELAY);
     } else {
       elements.output.value = "";
+      // Clear timeout if input is empty
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
     }
   });
 
-  // Enter key to convert
+  // Enter key to convert - with copy
   elements.input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
-      handleConvert();
+      // Clear the delayed copy timeout
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+      handleConvert(true);
     }
   });
 
@@ -314,6 +340,11 @@ function setupEventListeners() {
 
   // Global keyboard shortcuts
   document.addEventListener("keydown", handleKeyboardShortcuts);
+
+  // Add hint for toggle functionality
+  if (elements.heading) {
+    elements.heading.title = "Click to toggle conversion direction";
+  }
 }
 
 // Initialize App
